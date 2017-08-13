@@ -9,7 +9,7 @@
 		var fixDef=new box2d.b2FixtureDef();
 		fixDef.density=40.0;
 		fixDef.friction=0.5;
-		fixDef.restitution=0.5;
+		fixDef.restitution=0;
 		var force1=new box2d.b2Vec2(speed*Math.cos(angle*Math.PI/180),speed*Math.sin(angle*Math.PI/180));
 		var bodyDef=new box2d.b2BodyDef();
 		bodyDef.type=box2d.b2Body.b2_dynamicBody;
@@ -29,7 +29,7 @@
 	function tick(e) {
 		this.x=this.body.GetPosition().x*SCALE;
 		this.y=this.body.GetPosition().y*SCALE;
-		this.rotation=this.body.GetAngle()*(180/Math.PI);
+		// this.rotation=this.body.GetAngle()*(180/Math.PI);
 	}
 
 	window.Ball=Ball;
