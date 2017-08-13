@@ -4,13 +4,13 @@
 		this.view=new createjs.Bitmap("images/ball1.png");
 		this.view.regX=this.view.regY=25;
 		// 
-		var power=1;
-		// alert(power);
+		var speed=-1;
+		// alert(speed);
 		var fixDef=new box2d.b2FixtureDef();
 		fixDef.density=40.0;
 		fixDef.friction=0.5;
 		fixDef.restitution=0.5;
-		var force1=new box2d.b2Vec2(-power,0);
+		var force1=new box2d.b2Vec2(speed,0);
 		var bodyDef=new box2d.b2BodyDef();
 		bodyDef.type=box2d.b2Body.b2_kinematicBody;
 		bodyDef.position.x=1500/SCALE;

@@ -184,10 +184,10 @@ function whatKey(event) {
 
         // set power
         case 37:
-            powerDown();
+            SpeedDown();
             break;
         case 39:
-            powerUp();
+            speedUp();
             break;
     }
 }
@@ -231,6 +231,7 @@ function sliderLine(){
     var img2 = new Image();
     img2.src = "images/point.png";
     point = new createjs.Bitmap(img2);
+    
 
     
     line.x = 300;
@@ -245,34 +246,47 @@ function sliderLine(){
     point.regX = 5;
     point.regY = 5;
 
-    textPow=new createjs.Text("set power :","20px Arial","black");
+    textPow=new createjs.Text("Set Speed :","20px Arial","black");
     textPow.x=130;
     textPow.y=10;
-
+    SetSpeed();
     stage.addChild(line);
     stage.addChild(point);
     stage.addChild(textPow);    
 }
 
-function powerUp()
+function speedUp()
 {
     if(point.x<350){
-        point.x+=5;
+        point.x+=4;
+        SetSpeed();
         // alert(distance);
     }
     
 }
 
-function powerDown()
+function SpeedDown()
 {
     if(point.x>250){
-        point.x-=5;
+        point.x-=4;
+        SetSpeed();
     }
 
     
 }
+var speed;
+var tspeed="0";
 
-
+function SetSpeed()
+{
+    stage.removeChild(tspeed);
+    speed=(point.x-250)/4;
+    tspeed=speed;
+    tspeed=new createjs.Text(tspeed,"20px Arial","black");
+    tspeed.x=360;
+    tspeed.y=10;
+    stage.addChild(tspeed); 
+}
 
 
 // ==============================================================================================================
@@ -329,10 +343,9 @@ function ShootBall() {
     var newX=125+(110*Math.cos((-angle*Math.PI)/180));
     var newY=465-(110*Math.sin((-angle*Math.PI)/180));
     var newangle=-(angle*Math.PI)/180;
-    var force=150*(point.x-250);
-
-    // alert(force);
-    ball=new Ball(newX,newY,angle,force);
+    
+    // alert(speed);
+    ball=new Ball(newX,newY,angle,speed);
     stage.addChild(ball.view);  
    
 
