@@ -59,8 +59,10 @@
 
 var SCALE=30;
 
-var stage,world,debug,ball,ball3,background,wall,wood,sball,box,contact;
+var stage,world,debug,ball,background,contact,refresh,switchs;
 this.bodiesMap = {};
+var ballCount=0
+var hitCount=0
 
 function init() { 
     // window.addEventListener('keydown', whatKey, true);
@@ -69,28 +71,19 @@ function init() {
     backgroundLoad();
     setupPhysics();
     rotateGun();
-    sliderLine()
+    sliderLine();
+    refreshLoad();
 
 
-    wall=new Wall();
-    stage.addChild(wall.view);
+    ground_small=new GroundSmall();
+    stage.addChild(ground_small.view);
 
-
-    wood=new Wood();
-    stage.addChild(wood.view);
-
-    box=new Box();
-    stage.addChild(box.view);
-
-    sball=new Static_Ball();
-    stage.addChild(sball.view);
-
-    ball3=new Ball3();
-    stage.addChild(ball3.view);
-
-
-
+    tree=new Tree();
+    stage.addChild(tree.view);
     
+    switchs=new Switch();
+    stage.addChild(switchs.view);
+
 
     
     createjs.Ticker.addListener(this);
@@ -107,23 +100,50 @@ window.addEventListener('keydown', whatKey, true);
 
 //============================================================================================================================
 // Insert Gun and Rotate 
-// ===========================================================================================================================
+// =========================================================================================================================== 
+
 
 function rotateGun(){
     var img = new Image();
-    img.src = "images/gun.png";
+    img.src = "images/gun150x75.png";
     gun = new createjs.Bitmap(img);
+    gun.x = 109;
+    gun.y = 500;
     
-    // he starts at the bottom center of the canvas
-    gun.x = 140;
-    gun.y = 480;
-    
-    gun.regX = 90;
-    gun.regY = 76;
+    gun.regX = 68.5;
+    gun.regY = 56.5;
     stage.addChild(gun);    
 }
 var text="";
 
+
+// ==================================================================================================
+// refresh
+// ==================================================================================================
+function refreshLoad() {
+
+    stage.enableMouseOver();
+    
+    var img = new Image();
+    img.src = "images/menu_refresh.png";
+    refresh = new createjs.Bitmap(img);
+    refresh.x = 1100;
+    refresh.y = 10;
+    stage.addChild(refresh); 
+
+    refresh.addEventListener("click", handleMouseEvent); 
+    refresh.addEventListener("dblclick", handleMouseEvent);
+}
+
+function handleMouseEvent(evt) {
+    stage.removeAllChildren();
+    angle=0;
+    hitCount=0;
+    ballCount=0;
+    init();
+}
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////
 function ViewAngle(angle)
 {
     stage.removeChild(text);
@@ -155,7 +175,8 @@ function manageDirection(){
 //=========================================================================================================================== 
 
 function whatKey(event) {
-    switch (event.keyCode) {
+    if (ballCount<1) {
+        switch (event.keyCode) {
 
         // rotate gun
         case 40:
@@ -184,25 +205,19 @@ function whatKey(event) {
 
         // set power
         case 37:
-            powerDown();
+            SpeedDown();
             break;
         case 39:
-            powerUp();
+            speedUp();
             break;
-    }
+        }
+    } 
 }
 
 // ==============================================================================================================
 // register body
 // ==============================================================================================================
-// function registerBody(bodyDef) {
-//     var body = world.CreateBody(bodyDef);
-//     alert(bodyDef);
-//     this.bodiesMap[body.GetUserData()] = bodyDef;
-//     // alert("sdfsdf");
-//     return body;
-// }
-// ===========================================================================================================================
+// ==============================================================================================================
     function registerBody(bodyDef) {
         
         this.bodiesMap[0]=bodyDef;
@@ -213,8 +228,6 @@ function whatKey(event) {
         
         var obj=this.bodiesMap[0];
         world.DestroyBody(obj);
-        stage.removeChild(wall.view);
-
     }
 
 
@@ -231,6 +244,7 @@ function sliderLine(){
     var img2 = new Image();
     img2.src = "images/point.png";
     point = new createjs.Bitmap(img2);
+    
 
     
     line.x = 300;
@@ -245,35 +259,165 @@ function sliderLine(){
     point.regX = 5;
     point.regY = 5;
 
-    textPow=new createjs.Text("set power :","20px Arial","black");
+    textPow=new createjs.Text("Set Speed :","20px Arial","black");
     textPow.x=130;
     textPow.y=10;
-
+    SetSpeed();
     stage.addChild(line);
     stage.addChild(point);
     stage.addChild(textPow);    
 }
 
-function powerUp()
+function speedUp()
 {
     if(point.x<350){
-        point.x+=5;
+        point.x+=4;
+        SetSpeed();
         // alert(distance);
     }
     
 }
 
-function powerDown()
+function SpeedDown()
 {
     if(point.x>250){
-        point.x-=5;
+        point.x-=4;
+        SetSpeed();
     }
 
     
 }
+var speed;
+var tspeed="0";
+
+function SetSpeed()
+{
+    stage.removeChild(tspeed);
+    speed=(point.x-250)/4;
+    tspeed=speed;
+    tspeed=new createjs.Text(tspeed,"20px Arial","black");
+    tspeed.x=360;
+    tspeed.y=10;
+    stage.addChild(tspeed); 
+}
+
+function stageWin()
+{
+    BackRetryNext();
+    var img1 = new Image();
+    img1.src = "images/win.png";
+    win = new createjs.Bitmap(img1);
+    win.regX=170;
+    win.regY=150;
+
+    win.x=600;
+    win.y=200;
+    stage.addChild(win);
+
+}
+
+function stageRetry() {
+    backRetry();
+    var img1 = new Image();
+    img1.src = "images/Tryagain.png";
+    retry = new createjs.Bitmap(img1);
+    retry.regX=283;
+    retry.regY=150;
+
+    retry.x=640;
+    retry.y=200;
+    stage.addChild(retry);
+    
+    
+}
+
+
+function BackRetryNext() {
+    stage.enableMouseOver();
+    
+    var img = new Image();
+    img.src = "images/menu_refresh.png";
+    refresh = new createjs.Bitmap(img);
+    refresh.x = 600;
+    refresh.y = 300;
+    stage.addChild(refresh); 
+
+    var img1 = new Image();
+    img1.src = "images/menu_next.png";
+    next = new createjs.Bitmap(img1);
+    next.x = 680;
+    next.y = 300;
+    stage.addChild(next); 
+
+    var img2 = new Image();
+    img2.src = "images/menu_back.png";
+    back = new createjs.Bitmap(img2);
+    back.x = 520;
+    back.y = 300;
+    stage.addChild(back); 
+
+    refresh.addEventListener("click", handleMouseEvent); 
+    refresh.addEventListener("dblclick", handleMouseEvent);
+
+    next.addEventListener("click", LoadNext); 
+    next.addEventListener("dblclick", LoadNext);
+
+    back.addEventListener("click", Loadback); 
+    back.addEventListener("dblclick", Loadback);
+}
 
 
 
+function backRetry(){
+    stage.enableMouseOver();
+    
+    var img = new Image();
+    img.src = "images/menu_refresh.png";
+    refresh = new createjs.Bitmap(img);
+    refresh.x = 630;
+    refresh.y = 300;
+    stage.addChild(refresh); 
+
+
+    var img2 = new Image();
+    img2.src = "images/menu_back.png";
+    back = new createjs.Bitmap(img2);
+    back.x = 520;
+    back.y = 300;
+    stage.addChild(back); 
+
+    refresh.addEventListener("click", handleMouseEvent); 
+    refresh.addEventListener("dblclick", handleMouseEvent);
+
+    back.addEventListener("click", Loadback); 
+    back.addEventListener("dblclick", Loadback);
+}
+
+function LoadNext() {
+    window.location.href = "../Stage 3/game.html";
+}
+
+function Loadback() {
+    window.location.href = "../Stage 1/game.html";
+}
+
+
+function TurnOn() {
+    stage.removeChild(switchs.view);
+
+
+    var img = new Image();
+    img.src = "images/button_green60x20.png";
+    swtch = new createjs.Bitmap(img);
+    swtch.regX=10;
+    swtch.regY=30;
+    swtch.x=1086;
+    swtch.y=410;
+
+    stage.addChild(swtch); 
+
+
+}
 
 // ==============================================================================================================
    
@@ -282,11 +426,8 @@ function powerDown()
 //=============================================================================================================== 
 //  Contact listner
 // ==============================================================================================================
-// You are on the right track there are various events you can hook into with the b2ContactListener:
-// var contact=new box2d.b2ContactListener(this);
+
 var b2Listener = Box2D.Dynamics.b2ContactListener;
-
-
 //Add listeners for contact
 var listener = new b2Listener;
 
@@ -299,19 +440,33 @@ listener.EndContact = function(contact) {
 }
 
 listener.PostSolve = function(contact, impulse) {
-    if (contact.GetFixtureA().GetBody().GetUserData() == 'wall' && 
-            contact.GetFixtureB().GetBody().GetUserData() == 'Ball') {
-        var impulse = impulse.normalImpulses[0];
-        
-        if (impulse < 200) return; //threshold ignore small impacts
-        // world.ball.impulse = impulse > 0.6 ? 0.5 : impulse;
-        // 
-        
-        removeBody();
-         // world.DestroyBody(wall);
-        // console.log(world.ball.impulse);
+    if (contact.GetFixtureB().GetBody().GetUserData() == 'Ball' && hitCount<1)
+    {
+
+        hitCount+=1;
+
+        if (contact.GetFixtureA().GetBody().GetUserData() == 'switch' && 
+        contact.GetFixtureB().GetBody().GetUserData() == 'Ball' ) {
+            if (impulse < 200) 
+            {
+                stageRetry();
+                return;
+            }
+                 stageWin();
+                 TurnOn();
+        }
+        else
+        {
+            stageRetry();
+        }
     }
+
 }
+
+
+
+
+
 
 listener.PreSolve = function(contact, oldManifold) {
     // PreSolve
@@ -326,13 +481,12 @@ listener.PreSolve = function(contact, oldManifold) {
 
 
 function ShootBall() {
-    var newX=125+(110*Math.cos((-angle*Math.PI)/180));
-    var newY=465-(110*Math.sin((-angle*Math.PI)/180));
+    var newX=100+(80.5*Math.cos((-angle*Math.PI)/180));
+    var newY=488-(80.5*Math.sin((-angle*Math.PI)/180));
     var newangle=-(angle*Math.PI)/180;
-    var force=150*(point.x-250);
-
-    // alert(force);
-    ball=new Ball(newX,newY,angle,force);
+    ballCount+=1;
+    // alert(speed);
+    ball=new Ball(newX,newY,angle,speed);
     stage.addChild(ball.view);  
    
 
@@ -367,7 +521,7 @@ function setupPhysics()
     
     var fixDef=new box2d.b2FixtureDef(); 
     fixDef.density=1;
-    fixDef.friction=0.5;
+    fixDef.friction=1000000;
     var bodyDef=new box2d.b2BodyDef();
     bodyDef.type=box2d.b2Body.b2_staticBody;
     bodyDef.position.x=100/SCALE;
@@ -403,10 +557,10 @@ function backgroundLoad()
     ground.x=0;
     ground.y=560;
 
-    var gunBase =new createjs.Bitmap("images/canon_base.png");
+    var gunBase =new createjs.Bitmap("images/gunBase150x150.png");
     stage.addChild(gunBase);
     gunBase.x=10;
-    gunBase.y=425
+    gunBase.y=457
 
     createjs.Ticker.setFPS(60);
 

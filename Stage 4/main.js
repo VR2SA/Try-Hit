@@ -50,6 +50,8 @@
         b2WorldManifold: Box2D.Collision.b2WorldManifold,
         ClipVertex: Box2D.Collision.ClipVertex,
         Features: Box2D.Collision.Features,
+        b2RevoluteJointDef : Box2D.Dynamics.Joints.b2RevoluteJointDef,
+        b2PrismaticJointDef : Box2D.Dynamics.Joints.b2PrismaticJointDef,
         IBroadPhase: Box2D.Collision.IBroadPhase
        };
 
@@ -59,7 +61,7 @@
 
 var SCALE=30;
 
-var stage,world,debug,ball,ball3,background,wall,wood,sball,box,contact,refresh,output;
+var stage,world,debug,ball,background,contact,refresh,switchs,bridges;
 this.bodiesMap = {};
 var ballCount=0
 var hitCount=0
@@ -75,17 +77,34 @@ function init() {
     refreshLoad();
 
 
-    wall=new Wall();
-    stage.addChild(wall.view);
+    ground_small=new GroundSmall();
+    stage.addChild(ground_small.view); 
+
+    ground_small1=new GroundSmall1();
+    stage.addChild(ground_small1.view); 
+   
+    pendulos=new Pendulos();
+    stage.addChild(pendulos.view);
+
+    block=new Bridge();
+    stage.addChild(block.view)
 
 
-   box=new Box();
-   stage.addChild(box.view)
+    upperGround=new UpperGround();
+    stage.addChild(upperGround.view)
 
-
+    switchs=new Switch();
+    stage.addChild(switchs.view);
     
 
-    
+    bridges=new createjs.Bitmap("images/bridge.png");
+    bridges.regX=50;
+    bridges.regY=200;
+    bridges.scaleY=1.1;
+    bridges.x=595;
+    bridges.y=560;
+    stage.addChild(bridges);
+
     createjs.Ticker.addListener(this);
     createjs.Ticker.setFPS(60);
     createjs.Ticker.useRAF=true;  
@@ -107,9 +126,6 @@ function rotateGun(){
     var img = new Image();
     img.src = "images/gun150x75.png";
     gun = new createjs.Bitmap(img);
-
-    
-    // he starts at the bottom center of the canvas
     gun.x = 109;
     gun.y = 500;
     
@@ -140,10 +156,11 @@ function refreshLoad() {
 
 function handleMouseEvent(evt) {
     stage.removeAllChildren();
+    init();
     angle=0;
     hitCount=0;
     ballCount=0;
-    init();
+    
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -156,8 +173,20 @@ function ViewAngle(angle)
     stage.addChild(text); 
 }
 
+var bangle=0;
 
+function brideRotate() {
+  
+    if(bangle<90)
+    {
+        stage.removeChild(bridges);
+        bangle+=.5;
+        bridges.rotation=bangle;
+        stage.addChild(bridges);
+    }
 
+        
+}
 function manageDirection(){
 
     if(direction == "up"){
@@ -231,8 +260,6 @@ function whatKey(event) {
         
         var obj=this.bodiesMap[0];
         world.DestroyBody(obj);
-        // stage.removeChild(wall.view);
-
     }
 
 
@@ -318,7 +345,7 @@ function stageWin()
     win.x=600;
     win.y=200;
     stage.addChild(win);
-
+  
 }
 
 function stageRetry() {
@@ -354,6 +381,12 @@ function BackRetryNext() {
     next.y = 300;
     stage.addChild(next); 
 
+    var img2 = new Image();
+    img2.src = "images/menu_back.png";
+    back = new createjs.Bitmap(img2);
+    back.x = 520;
+    back.y = 300;
+    stage.addChild(back); 
 
     refresh.addEventListener("click", handleMouseEvent); 
     refresh.addEventListener("dblclick", handleMouseEvent);
@@ -361,6 +394,8 @@ function BackRetryNext() {
     next.addEventListener("click", LoadNext); 
     next.addEventListener("dblclick", LoadNext);
 
+    back.addEventListener("click", Loadback); 
+    back.addEventListener("dblclick", Loadback);
 }
 
 
@@ -371,21 +406,53 @@ function backRetry(){
     var img = new Image();
     img.src = "images/menu_refresh.png";
     refresh = new createjs.Bitmap(img);
-    refresh.x = 600;
+    refresh.x = 630;
     refresh.y = 300;
     stage.addChild(refresh); 
 
+
+    var img2 = new Image();
+    img2.src = "images/menu_back.png";
+    back = new createjs.Bitmap(img2);
+    back.x = 520;
+    back.y = 300;
+    stage.addChild(back); 
+
     refresh.addEventListener("click", handleMouseEvent); 
     refresh.addEventListener("dblclick", handleMouseEvent);
+
+    back.addEventListener("click", Loadback); 
+    back.addEventListener("dblclick", Loadback);
 }
 
 function LoadNext() {
-    window.location.href = "../Stage 2/game.html";
+    window.location.href = "../Stage 5/game.html";
+}
+
+function Loadback() {
+    window.location.href = "../Stage 3/game.html";
 }
 
 
+function TurnOn() {
+    check=true;
+    stage.removeChild(switchs.view);
 
 
+    var img = new Image();
+    img.src = "images/button_green60x20.png";
+
+    swtch = new createjs.Bitmap(img);
+    swtch.regX=10;
+    swtch.regY=30;
+    swtch.x=800;
+    swtch.y=160;
+    swtch.rotation=-90;
+
+    stage.addChild(swtch); 
+
+
+}
 
 // ==============================================================================================================
    
@@ -394,11 +461,8 @@ function LoadNext() {
 //=============================================================================================================== 
 //  Contact listner
 // ==============================================================================================================
-// You are on the right track there are various events you can hook into with the b2ContactListener:
-// var contact=new box2d.b2ContactListener(this);
+
 var b2Listener = Box2D.Dynamics.b2ContactListener;
-
-
 //Add listeners for contact
 var listener = new b2Listener;
 
@@ -411,25 +475,31 @@ listener.EndContact = function(contact) {
 }
 
 listener.PostSolve = function(contact, impulse) {
-    if (contact.GetFixtureB().GetBody().GetUserData() == 'Ball' && hitCount<1)
+
+    if (contact.GetFixtureB().GetBody().GetUserData() == 'Pendulos' && hitCount<2)
     {
 
-        hitCount+=1;
+        
+        
+        if (contact.GetFixtureB().GetBody().GetUserData() == 'Pendulos' &&
+        contact.GetFixtureA().GetBody().GetUserData() == 'switch' && hitCount<2 ) {
+            hitCount+=1;
+            TurnOn();
+            stageWin();
+        }
 
-        if (contact.GetFixtureA().GetBody().GetUserData() == 'target' && 
-        contact.GetFixtureB().GetBody().GetUserData() == 'Ball' ) {
-            if (impulse < 200) 
-            {
-                stageRetry();
-                return;
-            }
-                 stageWin();
+        else if(contact.GetFixtureB().GetBody().GetUserData() == 'Pendulos' && 
+                contact.GetFixtureA().GetBody().GetUserData() == 'Ball')
+        {
+
+           hitCount+=1; 
         }
         else
         {
             stageRetry();
         }
     }
+            
 
 }
 
@@ -491,11 +561,11 @@ function setupPhysics()
     
     var fixDef=new box2d.b2FixtureDef(); 
     fixDef.density=1;
-    fixDef.friction=1000000;
+    fixDef.friction=.5;
     var bodyDef=new box2d.b2BodyDef();
     bodyDef.type=box2d.b2Body.b2_staticBody;
     bodyDef.position.x=100/SCALE;
-    bodyDef.position.y=600/SCALE;
+    bodyDef.position.y=700/SCALE;
     fixDef.shape=new box2d.b2PolygonShape();
     fixDef.shape.SetAsBox(1200/SCALE,40/SCALE);
     world.CreateBody(bodyDef).CreateFixture(fixDef);
@@ -506,7 +576,6 @@ function setupPhysics()
     debugDraw.SetSprite(debug.getContext('2d'));
     debugDraw.SetDrawScale(30);
     debugDraw.SetFillAlpha(0.001);
-    debugDraw.SetLineThickness(0.1);
     //  debugDraw.SetDrawScale(SCALE);
  
     debugDraw.SetFlags (box2d.b2DebugDraw.e_shapeBit | box2d.b2DebugDraw.e_jointBit);
@@ -528,6 +597,11 @@ function backgroundLoad()
     ground.x=0;
     ground.y=560;
 
+    var water =new createjs.Bitmap("images/water.png");
+    stage.addChild(water);
+    water.x=600;
+    water.y=555;
+
     var gunBase =new createjs.Bitmap("images/gunBase150x150.png");
     stage.addChild(gunBase);
     gunBase.x=10;
@@ -538,10 +612,10 @@ function backgroundLoad()
     stage.update();
 }
 
-
+var check=false;
 function tick(event) {
-    // 
-    
+    if(check)
+        brideRotate();
     manageDirection();
     stage.update(event);
     world.DrawDebugData();

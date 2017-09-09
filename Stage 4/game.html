@@ -22,6 +22,7 @@
 <body onload=  "init()">
 
 <div id="canvas_in" style="height:600px; width:1200px">
+	
 	<canvas id="debug" width="1200" height="600" ></canvas>
 	<canvas id="canvas" width="1200" height="600" ></canvas>
 	
@@ -29,9 +30,13 @@
 	<script src="../support/Box2d.min.js"></script>
 	<!-- <script src="../support/easeljs-0.5.0.min.js"></script> -->
 	<script src="../support/easeljs-0.6.0.min.js"></script>
-	<script src="Obj/tree.js"></script>
+	<script src="Obj/Pendulos.js"></script>
+	<script src="Obj/bridge.js"></script>
 	<script src="Obj/switch.js"></script>
 	<script src="Obj/ground_small.js"></script>
+	<script src="Obj/UpperGround.js"></script>
+	<script src="Obj/switch.js"></script>
+	<script src="Obj/ground_small1.js"></script>
 	<script src="Obj/Ball.js"></script>
 	<script src="main.js"></script>
 
@@ -42,8 +47,20 @@
 </div>
 
 	
+ <div>
+      <label>Power: <input type="range" min="1" max="200" id="power" value="30"></label><output id="power-output">30</output>
+    </div>
 
-
+<!--  <script>
+    function linkRangeToOutput(id) {
+      document.getElementById(id).addEventListener('change', function(e) {
+        document.getElementById(id+'-output').value = e.target.value;
+      });
+    }
+    linkRangeToOutput('power');
+    linkRangeToOutput('angle');
+    </script>
+     -->
 
 
 

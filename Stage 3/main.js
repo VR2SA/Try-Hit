@@ -59,7 +59,7 @@
 
 var SCALE=30;
 
-var stage,world,debug,ball,ball3,background,wall,wood,sball,box,contact,refresh,output;
+var stage,world,debug,ball,background,contact,refresh,switchs;
 this.bodiesMap = {};
 var ballCount=0
 var hitCount=0
@@ -75,16 +75,15 @@ function init() {
     refreshLoad();
 
 
+    ground_small=new GroundSmall();
+    stage.addChild(ground_small.view); 
+
+    ground_small1=new GroundSmall1();
+    stage.addChild(ground_small1.view); 
     wall=new Wall();
     stage.addChild(wall.view);
 
-
-   box=new Box();
-   stage.addChild(box.view)
-
-
-    
-
+ 
     
     createjs.Ticker.addListener(this);
     createjs.Ticker.setFPS(60);
@@ -107,9 +106,6 @@ function rotateGun(){
     var img = new Image();
     img.src = "images/gun150x75.png";
     gun = new createjs.Bitmap(img);
-
-    
-    // he starts at the bottom center of the canvas
     gun.x = 109;
     gun.y = 500;
     
@@ -231,8 +227,6 @@ function whatKey(event) {
         
         var obj=this.bodiesMap[0];
         world.DestroyBody(obj);
-        // stage.removeChild(wall.view);
-
     }
 
 
@@ -276,7 +270,7 @@ function sliderLine(){
 function speedUp()
 {
     if(point.x<350){
-        point.x+=4;
+        point.x+=7;
         SetSpeed();
         // alert(distance);
     }
@@ -286,7 +280,7 @@ function speedUp()
 function SpeedDown()
 {
     if(point.x>250){
-        point.x-=4;
+        point.x-=7;
         SetSpeed();
     }
 
@@ -298,7 +292,7 @@ var tspeed="0";
 function SetSpeed()
 {
     stage.removeChild(tspeed);
-    speed=(point.x-250)/4;
+    speed=(point.x-250)/7;
     tspeed=speed;
     tspeed=new createjs.Text(tspeed,"20px Arial","black");
     tspeed.x=360;
@@ -354,6 +348,12 @@ function BackRetryNext() {
     next.y = 300;
     stage.addChild(next); 
 
+    var img2 = new Image();
+    img2.src = "images/menu_back.png";
+    back = new createjs.Bitmap(img2);
+    back.x = 520;
+    back.y = 300;
+    stage.addChild(back); 
 
     refresh.addEventListener("click", handleMouseEvent); 
     refresh.addEventListener("dblclick", handleMouseEvent);
@@ -361,6 +361,8 @@ function BackRetryNext() {
     next.addEventListener("click", LoadNext); 
     next.addEventListener("dblclick", LoadNext);
 
+    back.addEventListener("click", Loadback); 
+    back.addEventListener("dblclick", Loadback);
 }
 
 
@@ -371,21 +373,50 @@ function backRetry(){
     var img = new Image();
     img.src = "images/menu_refresh.png";
     refresh = new createjs.Bitmap(img);
-    refresh.x = 600;
+    refresh.x = 630;
     refresh.y = 300;
     stage.addChild(refresh); 
 
+
+    var img2 = new Image();
+    img2.src = "images/menu_back.png";
+    back = new createjs.Bitmap(img2);
+    back.x = 520;
+    back.y = 300;
+    stage.addChild(back); 
+
     refresh.addEventListener("click", handleMouseEvent); 
     refresh.addEventListener("dblclick", handleMouseEvent);
+
+    back.addEventListener("click", Loadback); 
+    back.addEventListener("dblclick", Loadback);
 }
 
 function LoadNext() {
+    window.location.href = "../Stage 4/game.html";
+}
+
+function Loadback() {
     window.location.href = "../Stage 2/game.html";
 }
 
 
+function TurnOn() {
+    stage.removeChild(switchs.view);
 
 
+    var img = new Image();
+    img.src = "images/button_green60x20.png";
+    swtch = new createjs.Bitmap(img);
+    swtch.regX=10;
+    swtch.regY=30;
+    swtch.x=1086;
+    swtch.y=410;
+
+    stage.addChild(swtch); 
+
+
+}
 
 // ==============================================================================================================
    
@@ -394,11 +425,8 @@ function LoadNext() {
 //=============================================================================================================== 
 //  Contact listner
 // ==============================================================================================================
-// You are on the right track there are various events you can hook into with the b2ContactListener:
-// var contact=new box2d.b2ContactListener(this);
+
 var b2Listener = Box2D.Dynamics.b2ContactListener;
-
-
 //Add listeners for contact
 var listener = new b2Listener;
 
@@ -411,25 +439,12 @@ listener.EndContact = function(contact) {
 }
 
 listener.PostSolve = function(contact, impulse) {
-    if (contact.GetFixtureB().GetBody().GetUserData() == 'Ball' && hitCount<1)
-    {
 
-        hitCount+=1;
-
-        if (contact.GetFixtureA().GetBody().GetUserData() == 'target' && 
-        contact.GetFixtureB().GetBody().GetUserData() == 'Ball' ) {
-            if (impulse < 200) 
-            {
-                stageRetry();
-                return;
-            }
+            if (contact.GetFixtureA().GetBody().GetUserData() == 'wall' && 
+            contact.GetFixtureB().GetBody().GetUserData() == 'ground_small' && hitCount<1 ) {
+                hitCount++;
                  stageWin();
         }
-        else
-        {
-            stageRetry();
-        }
-    }
 
 }
 
@@ -491,11 +506,11 @@ function setupPhysics()
     
     var fixDef=new box2d.b2FixtureDef(); 
     fixDef.density=1;
-    fixDef.friction=1000000;
+    fixDef.friction=.5;
     var bodyDef=new box2d.b2BodyDef();
     bodyDef.type=box2d.b2Body.b2_staticBody;
     bodyDef.position.x=100/SCALE;
-    bodyDef.position.y=600/SCALE;
+    bodyDef.position.y=640/SCALE;
     fixDef.shape=new box2d.b2PolygonShape();
     fixDef.shape.SetAsBox(1200/SCALE,40/SCALE);
     world.CreateBody(bodyDef).CreateFixture(fixDef);
@@ -506,7 +521,6 @@ function setupPhysics()
     debugDraw.SetSprite(debug.getContext('2d'));
     debugDraw.SetDrawScale(30);
     debugDraw.SetFillAlpha(0.001);
-    debugDraw.SetLineThickness(0.1);
     //  debugDraw.SetDrawScale(SCALE);
  
     debugDraw.SetFlags (box2d.b2DebugDraw.e_shapeBit | box2d.b2DebugDraw.e_jointBit);
@@ -527,6 +541,11 @@ function backgroundLoad()
     stage.addChild(ground);
     ground.x=0;
     ground.y=560;
+
+    var water =new createjs.Bitmap("images/water.png");
+    stage.addChild(water);
+    water.x=600;
+    water.y=555;
 
     var gunBase =new createjs.Bitmap("images/gunBase150x150.png");
     stage.addChild(gunBase);

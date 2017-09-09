@@ -50,6 +50,8 @@
         b2WorldManifold: Box2D.Collision.b2WorldManifold,
         ClipVertex: Box2D.Collision.ClipVertex,
         Features: Box2D.Collision.Features,
+        b2RevoluteJointDef : Box2D.Dynamics.Joints.b2RevoluteJointDef,
+        b2PrismaticJointDef : Box2D.Dynamics.Joints.b2PrismaticJointDef,
         IBroadPhase: Box2D.Collision.IBroadPhase
        };
 
@@ -59,11 +61,12 @@
 
 var SCALE=30;
 
-var stage,world,debug,ball,ball3,background,wall,wood,sball,box,contact,refresh,output;
+var stage,world,debug,ball,background,contact,refresh,switchs, plane,bomb;
 this.bodiesMap = {};
 var ballCount=0
 var hitCount=0
-
+var pos=true;
+var planeHit=false;
 function init() { 
     // window.addEventListener('keydown', whatKey, true);
     stage=new createjs.Stage(document.getElementById("canvas"));
@@ -72,20 +75,22 @@ function init() {
     setupPhysics();
     rotateGun();
     sliderLine();
+   
+    
+
+    ground_small=new GroundSmall();
+    stage.addChild(ground_small.view); 
+
+    ground_small1=new GroundSmall1();
+    stage.addChild(ground_small1.view); 
+   
+
+    block=new Bridge();
+    stage.addChild(block.view);
+
+    showPlane();
+
     refreshLoad();
-
-
-    wall=new Wall();
-    stage.addChild(wall.view);
-
-
-   box=new Box();
-   stage.addChild(box.view)
-
-
-    
-
-    
     createjs.Ticker.addListener(this);
     createjs.Ticker.setFPS(60);
     createjs.Ticker.useRAF=true;  
@@ -97,6 +102,19 @@ var angle=0;
 var direction = "";
 window.addEventListener('keydown', whatKey, true);  
 
+function showPlane() {
+    plane=new createjs.Bitmap("images/plane.png");
+    plane.regX=75;
+    plane.regY=40;
+    plane.scaleX=1.2;
+    plane.scaleY=1.2;
+
+    plane.x=1200;
+    plane.y=60;
+
+    stage.addChild(plane);
+    // body...
+}
 
 //============================================================================================================================
 // Insert Gun and Rotate 
@@ -107,9 +125,6 @@ function rotateGun(){
     var img = new Image();
     img.src = "images/gun150x75.png";
     gun = new createjs.Bitmap(img);
-
-    
-    // he starts at the bottom center of the canvas
     gun.x = 109;
     gun.y = 500;
     
@@ -140,10 +155,11 @@ function refreshLoad() {
 
 function handleMouseEvent(evt) {
     stage.removeAllChildren();
+    init();
     angle=0;
     hitCount=0;
     ballCount=0;
-    init();
+    
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -155,8 +171,6 @@ function ViewAngle(angle)
     text.y=10;
     stage.addChild(text); 
 }
-
-
 
 function manageDirection(){
 
@@ -231,8 +245,6 @@ function whatKey(event) {
         
         var obj=this.bodiesMap[0];
         world.DestroyBody(obj);
-        // stage.removeChild(wall.view);
-
     }
 
 
@@ -278,7 +290,6 @@ function speedUp()
     if(point.x<350){
         point.x+=4;
         SetSpeed();
-        // alert(distance);
     }
     
 }
@@ -309,6 +320,7 @@ function SetSpeed()
 function stageWin()
 {
     BackRetryNext();
+    pos=false;
     var img1 = new Image();
     img1.src = "images/win.png";
     win = new createjs.Bitmap(img1);
@@ -318,7 +330,7 @@ function stageWin()
     win.x=600;
     win.y=200;
     stage.addChild(win);
-
+  
 }
 
 function stageRetry() {
@@ -335,6 +347,56 @@ function stageRetry() {
     
     
 }
+
+function BlastBridge() {
+    var img = new Image();
+    img.src = "images/blast.png";
+    blast = new createjs.Bitmap(img);
+    // blast.scaleY=0.1;
+    // blast.scaleX=0.1;
+    blast.regX=25;
+    blast.regY=25;
+
+    blast.x=650;
+    blast.y=500;
+    
+    stage.addChild(blast);
+    stage.removeChild(bomb.view);
+}
+var planeSmoke;
+var go=false;
+var planeX,planeY;
+function planeBlast(x,y)
+{
+    stage.removeChild(plane.view);
+    stage.removeChild(ball.view);
+    planeX=x;
+    planeY=y;
+    go=true;
+}
+
+function planeTranslate() {
+    if(go && planeX>-100)
+    {
+        planeX-=2;
+        planeY+=.5;
+        stage.removeChild(planeSmoke);
+        
+        planeSmoke=new createjs.Bitmap("images/planeSmoke.png");
+        planeSmoke.regX=75;
+        planeSmoke.regY=40;
+        planeSmoke.scaleX=1.2;
+        planeSmoke.scaleY=1.2;
+        planeSmoke.x=planeX;
+        planeSmoke.y=planeY;
+
+        stage.addChild(planeSmoke);
+    }
+}
+
+
+
+
 
 
 function BackRetryNext() {
@@ -354,6 +416,12 @@ function BackRetryNext() {
     next.y = 300;
     stage.addChild(next); 
 
+    var img2 = new Image();
+    img2.src = "images/menu_back.png";
+    back = new createjs.Bitmap(img2);
+    back.x = 520;
+    back.y = 300;
+    stage.addChild(back); 
 
     refresh.addEventListener("click", handleMouseEvent); 
     refresh.addEventListener("dblclick", handleMouseEvent);
@@ -361,6 +429,8 @@ function BackRetryNext() {
     next.addEventListener("click", LoadNext); 
     next.addEventListener("dblclick", LoadNext);
 
+    back.addEventListener("click", Loadback); 
+    back.addEventListener("dblclick", Loadback);
 }
 
 
@@ -371,21 +441,32 @@ function backRetry(){
     var img = new Image();
     img.src = "images/menu_refresh.png";
     refresh = new createjs.Bitmap(img);
-    refresh.x = 600;
+    refresh.x = 630;
     refresh.y = 300;
     stage.addChild(refresh); 
 
+
+    var img2 = new Image();
+    img2.src = "images/menu_back.png";
+    back = new createjs.Bitmap(img2);
+    back.x = 520;
+    back.y = 300;
+    stage.addChild(back); 
+
     refresh.addEventListener("click", handleMouseEvent); 
     refresh.addEventListener("dblclick", handleMouseEvent);
+
+    back.addEventListener("click", Loadback); 
+    back.addEventListener("dblclick", Loadback);
 }
 
 function LoadNext() {
-    window.location.href = "../Stage 2/game.html";
+    window.location.href = "../Stage 6/game.html";
 }
 
-
-
-
+function Loadback() {
+    window.location.href = "../Stage 4/game.html";
+}
 
 // ==============================================================================================================
    
@@ -394,11 +475,8 @@ function LoadNext() {
 //=============================================================================================================== 
 //  Contact listner
 // ==============================================================================================================
-// You are on the right track there are various events you can hook into with the b2ContactListener:
-// var contact=new box2d.b2ContactListener(this);
+
 var b2Listener = Box2D.Dynamics.b2ContactListener;
-
-
 //Add listeners for contact
 var listener = new b2Listener;
 
@@ -411,25 +489,32 @@ listener.EndContact = function(contact) {
 }
 
 listener.PostSolve = function(contact, impulse) {
-    if (contact.GetFixtureB().GetBody().GetUserData() == 'Ball' && hitCount<1)
+
+    if (contact.GetFixtureA().GetBody().GetUserData() == 'Plane' && hitCount<1)
     {
-
-        hitCount+=1;
-
-        if (contact.GetFixtureA().GetBody().GetUserData() == 'target' && 
-        contact.GetFixtureB().GetBody().GetUserData() == 'Ball' ) {
-            if (impulse < 200) 
-            {
-                stageRetry();
-                return;
-            }
-                 stageWin();
+        
+        if (contact.GetFixtureA().GetBody().GetUserData() == 'Plane' &&
+        contact.GetFixtureB().GetBody().GetUserData() == 'Ball' && hitCount<1 ) {
+            hitCount+=1;
+            stageWin();
+           
+            planeHit=true;
         }
+
         else
         {
             stageRetry();
         }
     }
+
+    if (contact.GetFixtureA().GetBody().GetUserData() == 'Bomb' && contact.GetFixtureB().GetBody().GetUserData() == 'Bridge' && hitCount<1)
+    {
+        pos=true;
+        BlastBridge();
+        stageRetry();
+        hitCount+=1;
+
+    }      
 
 }
 
@@ -444,20 +529,29 @@ listener.PreSolve = function(contact, oldManifold) {
 
 
 
-
+function releaseBomb() {
+    bomb=new Bomb();
+    stage.addChild(bomb.view);
+    // body...
+}
 // ===========================================================================================================================
 // Shoot the Ball
 //============================================================================================================================
 
 
 function ShootBall() {
+    stage.removeChild(plane);
     var newX=100+(80.5*Math.cos((-angle*Math.PI)/180));
     var newY=488-(80.5*Math.sin((-angle*Math.PI)/180));
     var newangle=-(angle*Math.PI)/180;
     ballCount+=1;
-    // alert(speed);
     ball=new Ball(newX,newY,angle,speed);
     stage.addChild(ball.view);  
+
+   
+
+    plane=new Plane(5);
+    stage.addChild(plane.view);
    
 
 }
@@ -491,11 +585,11 @@ function setupPhysics()
     
     var fixDef=new box2d.b2FixtureDef(); 
     fixDef.density=1;
-    fixDef.friction=1000000;
+    fixDef.friction=.5;
     var bodyDef=new box2d.b2BodyDef();
     bodyDef.type=box2d.b2Body.b2_staticBody;
     bodyDef.position.x=100/SCALE;
-    bodyDef.position.y=600/SCALE;
+    bodyDef.position.y=700/SCALE;
     fixDef.shape=new box2d.b2PolygonShape();
     fixDef.shape.SetAsBox(1200/SCALE,40/SCALE);
     world.CreateBody(bodyDef).CreateFixture(fixDef);
@@ -506,9 +600,8 @@ function setupPhysics()
     debugDraw.SetSprite(debug.getContext('2d'));
     debugDraw.SetDrawScale(30);
     debugDraw.SetFillAlpha(0.001);
-    debugDraw.SetLineThickness(0.1);
     //  debugDraw.SetDrawScale(SCALE);
- 
+
     debugDraw.SetFlags (box2d.b2DebugDraw.e_shapeBit | box2d.b2DebugDraw.e_jointBit);
     world.SetDebugDraw(debugDraw);
     world.SetContactListener(listener);
@@ -528,6 +621,11 @@ function backgroundLoad()
     ground.x=0;
     ground.y=560;
 
+    var water =new createjs.Bitmap("images/water.png");
+    stage.addChild(water);
+    water.x=600;
+    water.y=555;
+
     var gunBase =new createjs.Bitmap("images/gunBase150x150.png");
     stage.addChild(gunBase);
     gunBase.x=10;
@@ -538,11 +636,10 @@ function backgroundLoad()
     stage.update();
 }
 
-
+var check=false;
 function tick(event) {
-    // 
-    
     manageDirection();
+    planeTranslate();
     stage.update(event);
     world.DrawDebugData();
     world.Step(1/60,10,10);
