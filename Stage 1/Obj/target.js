@@ -13,7 +13,7 @@
 		fixDef.restitution=0.5;
 		var bodyDef=new box2d.b2BodyDef();
 		bodyDef.type=box2d.b2Body.b2_staticBody;
-		bodyDef.position.x=980/SCALE;
+		bodyDef.position.x=990/SCALE;
 		bodyDef.position.y=555/SCALE;
 		bodyDef.userData = "target";
 

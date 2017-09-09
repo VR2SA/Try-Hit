@@ -73,7 +73,7 @@ function init() {
     rotateGun();
     sliderLine();
     refreshLoad();
-
+    question();
 
     ground_small=new GroundSmall();
     stage.addChild(ground_small.view);
@@ -400,6 +400,52 @@ function LoadNext() {
 function Loadback() {
     window.location.href = "../Stage 1/game.html";
 }
+
+var quize;
+
+function question() 
+{
+    stage.enableMouseOver();
+    
+    var img = new Image();
+    img.src = "images/quize.png";
+    quize = new createjs.Bitmap("images/quize.png");
+    quize.x = 400;
+    quize.y = 0;
+    stage.addChild(quize); 
+    quize.addEventListener("mouseover", showQuestion);
+    quize.addEventListener("mouseout", removeQuestion);
+    
+}
+var question,questionBox;
+
+function showQuestion()
+{
+    var img = new Image();
+    img.src = "images/outerBox.png";
+    questionBox = new createjs.Bitmap(img);
+    questionBox.x = 275;
+    questionBox.y = 40;
+
+    stage.addChild(questionBox);
+}
+
+function removeQuestion()
+{
+    stage.removeChild(questionBox)
+}
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 function TurnOn() {

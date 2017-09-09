@@ -73,6 +73,7 @@ function init() {
     rotateGun();
     sliderLine();
     refreshLoad();
+    question() ;
 
 
     wall=new Wall();
@@ -362,8 +363,40 @@ function BackRetryNext() {
     next.addEventListener("dblclick", LoadNext);
 
 }
+// ////////////////////////////////////////////////////////////////////////////////////////////////////////////
+var quize;
 
+function question() 
+{
+    stage.enableMouseOver();
+    
+    var img = new Image();
+    img.src = "images/quize.png";
+    quize = new createjs.Bitmap(img);
+    quize.x = 400;
+    quize.y = 0;
+    stage.addChild(quize); 
+    quize.addEventListener("mouseover", showQuestion);
+    quize.addEventListener("mouseout", removeQuestion);
+    
+}
+var question,questionBox;
 
+function showQuestion()
+{
+    var img = new Image();
+    img.src = "images/outerBox.png";
+    questionBox = new createjs.Bitmap(img);
+    questionBox.x = 275;
+    questionBox.y = 40;
+
+    stage.addChild(questionBox);
+}
+
+function removeQuestion()
+{
+    stage.removeChild(questionBox)
+}
 
 function backRetry(){
     stage.enableMouseOver();
@@ -523,10 +556,10 @@ function backgroundLoad()
     var background = new createjs.Bitmap("images/background.png");
     stage.addChild(background);
 
-    var ground =new createjs.Bitmap("images/ground.png");
-    stage.addChild(ground);
-    ground.x=0;
-    ground.y=560;
+    // var ground =new createjs.Bitmap("images/ground.png");
+    // stage.addChild(ground);
+    // ground.x=0;
+    // ground.y=560;
 
     var gunBase =new createjs.Bitmap("images/gunBase150x150.png");
     stage.addChild(gunBase);
