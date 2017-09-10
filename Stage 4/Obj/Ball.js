@@ -29,7 +29,12 @@
 	function tick(e) {
 		this.x=this.body.GetPosition().x*SCALE;
 		this.y=this.body.GetPosition().y*SCALE;
-		// this.rotation=this.body.GetAngle()*(180/Math.PI);
+		this.rotation=this.body.GetAngle()*(180/Math.PI);
+		if((this.x<-50 ||this.x>1650) && hitCount<1)
+		{
+			stageRetry();
+			hitCount++;
+		}
 	}
 
 	window.Ball=Ball;
