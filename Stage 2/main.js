@@ -59,7 +59,7 @@
 
 var SCALE=30;
 
-var stage,world,debug,ball,background,contact,refresh,switchs;
+var stage,world,debug,ball,background,contact,refresh,switchs,target;
 this.bodiesMap = {};
 var ballCount=0
 var hitCount=0
@@ -74,16 +74,22 @@ function init() {
     sliderLine();
     refreshLoad();
     question();
-
-    ground_small=new GroundSmall();
-    stage.addChild(ground_small.view);
-
-    tree=new Tree();
-    stage.addChild(tree.view);
     
-    switchs=new Switch();
-    stage.addChild(switchs.view);
+    xVAl=((Math.random()*1000)+200)%1100;
+    yVAl=((Math.random()*400)+200)%600;
 
+    //
+    // ground_small=new GroundSmall();
+    // stage.addChild(ground_small.view);
+
+    // tree=new Tree();
+    // stage.addChild(tree.view);
+    
+    // switchs=new Switch();
+    // stage.addChild(switchs.view);
+
+     target=new Target(xVAl,yVAl);
+    stage.addChild(target.view);
 
     
     createjs.Ticker.addListener(this);
@@ -491,7 +497,7 @@ listener.PostSolve = function(contact, impulse) {
 
         hitCount+=1;
 
-        if (contact.GetFixtureA().GetBody().GetUserData() == 'switch' && 
+        if (contact.GetFixtureA().GetBody().GetUserData() == 'target' && 
         contact.GetFixtureB().GetBody().GetUserData() == 'Ball' ) {
             if (impulse < 200) 
             {
@@ -525,18 +531,19 @@ listener.PreSolve = function(contact, oldManifold) {
 // Shoot the Ball
 //============================================================================================================================
 
-
+var gunBase;
 function ShootBall() {
-    var newX=100+(80.5*Math.cos((-angle*Math.PI)/180));
-    var newY=488-(80.5*Math.sin((-angle*Math.PI)/180));
+    var newX=100+(Math.cos((-angle*Math.PI)/180));
+    var newY=488-(Math.sin((-angle*Math.PI)/180));
     var newangle=-(angle*Math.PI)/180;
     ballCount+=1;
     // alert(speed);
     ball=new Ball(newX,newY,angle,speed);
     stage.addChild(ball.view);  
-   
-
+    stage.addChild(gun);   
+    stage.addChild(gunBase);
 }
+
 
 
 
@@ -598,12 +605,7 @@ function backgroundLoad()
     var background = new createjs.Bitmap("images/background.png");
     stage.addChild(background);
 
-    var ground =new createjs.Bitmap("images/ground.png");
-    stage.addChild(ground);
-    ground.x=0;
-    ground.y=560;
-
-    var gunBase =new createjs.Bitmap("images/gunBase150x150.png");
+    gunBase =new createjs.Bitmap("images/gunBase150x150.png");
     stage.addChild(gunBase);
     gunBase.x=10;
     gunBase.y=457

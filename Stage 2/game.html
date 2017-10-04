@@ -15,31 +15,96 @@
 		}
 	</style>
 
-	
+	 <meta charset="UTF-8">
+        <title>Control Panel-1</title>
+        <link rel="stylesheet" href="css/style.css">
 	
 	
 </head>
 <body onload=  "init()">
+	<!-- <div id="button_in" style=" float : right ;height:600px; background-color:blue;"> -->
+	<!-- <button id="shoot" onclick="ShootBall() ">shoot</button> -->
+	 
+        <script src="js/index.js"></script>
+ <div id="panel" class="panel-container">
+            <header>
+            Control Panel-1
+            </header>
+            <form action=";" method="POST">
+                <fieldset>
+                    <p>
+                        <table style="border:none;">
+                            <tr>
+                                <td>
+                                    <label for="angel" >
+                                        Angel (degree)
+                                    </label>
+                                </td>
+                                <td>
+                                    <input type="number" id="angel" value="" style="width:90px;" onchange="setAngle()" onkeyup="setAngle()" min ="0" max="50">
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <label for="speed">
+                                        Speed (m/s)
+                                    </label>
+                                </td>
+                                <td>
+                                    <input type="number" id="speed" style="width:90px; " onchange="setSpeed()" onkeyup="setSpeed()" min ="0" max="50">
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <label for="mass">
+                                        Mass (kg)
+                                    </label>
+                                </td>
+                                <td>
+                                    <input type="number" id="mass" value="" style="width:90px;">
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <label for="diameter">
+                                        Diameter (m)
+                                    </label>
+                                </td>
+                                <td>
+                                    <input type="number" id="diameter" value="" style="width:90px;">
+                                </td>
+                            </tr>
+                        </table>
+                    </p>
+                    <p>
+                        <button id="fire" type="button">Fire</button>
+                    </p>
+                </fieldset>
+            </form>
+        </div>
 
-<div id="canvas_in" style="height:600px; width:1200px">
-	<canvas id="debug" width="1200" height="600" ></canvas>
-	<canvas id="canvas" width="1200" height="600" ></canvas>
+
+
+
+
+</div> 
+
+<div id="canvas_in" style="height:600px; width:1150px ;position: absolute; background-color:blue;">
 	
+	<canvas id="canvas" width="1150" height="600" ></canvas>
+	<canvas id="debug" width="1150" height="600" ></canvas>
 	<script src="../support/Box2Dweb.js"></script>
 	<script src="../support/Box2d.min.js"></script>
 	<!-- <script src="../support/easeljs-0.5.0.min.js"></script> -->
 	<script src="../support/easeljs-0.6.0.min.js"></script>
-	<script src="Obj/tree.js"></script>
-	<script src="Obj/switch.js"></script>
-	<script src="Obj/ground_small.js"></script>
+	<script src="Obj/target.js"></script>
+	<script src="Obj/wall.js"></script>
 	<script src="Obj/Ball.js"></script>
 	<script src="main.js"></script>
 
 </div>
 
-<div id="button_in" style="position: relative; height:40px; width:1200px;background-color:blue;">
-	<!-- <button id="shoot" onclick="ShootBall() ">shoot</button> -->
-</div>
+
 
 	
 

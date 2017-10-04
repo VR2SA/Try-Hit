@@ -9,7 +9,7 @@
 		var fixDef=new box2d.b2FixtureDef();
 		fixDef.density=40.0;
 		fixDef.friction=0.5;
-		fixDef.restitution=0;
+		// fixDef.restitution=0;
 		var force1=new box2d.b2Vec2(speed*Math.cos(angle*Math.PI/180),speed*Math.sin(angle*Math.PI/180));
 		var bodyDef=new box2d.b2BodyDef();
 		bodyDef.type=box2d.b2Body.b2_dynamicBody;

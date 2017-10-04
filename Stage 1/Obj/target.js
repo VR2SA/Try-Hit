@@ -1,11 +1,13 @@
 (function(window) {
-	function Box()
+	function Target(xval)
 	{
-		this.view=new createjs.Bitmap("images/box40x40.png");
-		this.view.regX=20;
-		this.view.regY=20;
-		this.view.scaleY=.2;
-		this.view.scaleX=2;
+		// alert(xval);
+		
+		this.view=new createjs.Bitmap("images/HitPoint.png");
+		this.view.regX=50;
+		this.view.regY=25;
+		this.view.scaleY=.4;
+
 		
 		var fixDef=new box2d.b2FixtureDef();
 		fixDef.density=5.0;
@@ -13,15 +15,30 @@
 		fixDef.restitution=0.5;
 		var bodyDef=new box2d.b2BodyDef();
 		bodyDef.type=box2d.b2Body.b2_staticBody;
-		bodyDef.position.x=990/SCALE;
-		bodyDef.position.y=555/SCALE;
+		bodyDef.position.x=xval/SCALE;
+		bodyDef.position.y=460/SCALE;
+
+		 
 		bodyDef.userData = "target";
 
 		fixDef.shape=new box2d.b2PolygonShape();
-		fixDef.shape.SetAsBox(40/SCALE,4/SCALE);
+		fixDef.shape.SetAsBox(50/SCALE,10/SCALE);
 
 		this.view.body=world.CreateBody(bodyDef);
 		this.view.body.CreateFixture(fixDef);
+
+		var img = new Image();
+	    img.src = "images/target.png";
+	    tgt = new createjs.Bitmap(img);
+	    tgt.scaleX=.5;
+	    tgt.scaleY=.6;
+	    tgt.x = xval-30;
+	    tgt.y = 320;
+	    stage.addChild(tgt); 
+
+
+
+
 		this.view.onTick=tick;
 	}
 
@@ -31,5 +48,5 @@
 		this.rotation=this.body.GetAngle()*(180/Math.PI);
 	}
 
-	window.Box=Box;
+	window.Target=Target;
 })(window);

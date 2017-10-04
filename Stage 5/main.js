@@ -184,6 +184,26 @@ function manageDirection(){
         gun.rotation = angle;
         ViewAngle(angle);
 } 
+
+function setAngle()
+{
+    angle=-(document.getElementById("angel").value);
+    gun.rotation = angle;
+  
+}
+
+function setSpeed()
+{
+    var pointVal=document.getElementById("speed").value;
+    point.x=250;
+    var x=new Number(pointVal);
+   point.x= point.x+x; 
+  
+    SetSpeed();
+  
+}
+
+
 // ==========================================================================================================================
 
 

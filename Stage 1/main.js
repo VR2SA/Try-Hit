@@ -63,6 +63,8 @@ var stage,world,debug,ball,ball3,background,wall,wood,sball,box,contact,refresh,
 this.bodiesMap = {};
 var ballCount=0
 var hitCount=0
+var xVAl;
+
 
 function init() { 
     // window.addEventListener('keydown', whatKey, true);
@@ -74,14 +76,18 @@ function init() {
     sliderLine();
     refreshLoad();
     question() ;
-
+    xVAl=((Math.random()*530)+610)%1200;
+    if(xVAl<650)
+    {
+        xVAl+=100;
+    }
 
     wall=new Wall();
     stage.addChild(wall.view);
 
 
-   box=new Box();
-   stage.addChild(box.view)
+   target=new Target(xVAl);
+   stage.addChild(target.view)
 
 
     
@@ -105,18 +111,16 @@ window.addEventListener('keydown', whatKey, true);
 
 
 function rotateGun(){
-    var img = new Image();
-    img.src = "images/gun150x75.png";
-    gun = new createjs.Bitmap(img);
-
-    
-    // he starts at the bottom center of the canvas
-    gun.x = 109;
+   this.img = new Image();
+    this.img.src = "images/gun150x75.png";
+    gun = new createjs.Bitmap(this.img);
+      gun.x = 109;
     gun.y = 500;
     
     gun.regX = 68.5;
     gun.regY = 56.5;
-    stage.addChild(gun);    
+  
+    stage.addChild(gun);   
 }
 var text="";
 
@@ -144,6 +148,7 @@ function handleMouseEvent(evt) {
     angle=0;
     hitCount=0;
     ballCount=0;
+    xVAl=((Math.random()*530)+610)%1200;
     init();
 }
 
@@ -163,6 +168,7 @@ function manageDirection(){
 
     if(direction == "up"){
         gun.rotation = angle;
+
         ViewAngle(angle);
         
     }
@@ -171,6 +177,24 @@ function manageDirection(){
         gun.rotation = angle;
         ViewAngle(angle);
 } 
+
+function setAngle()
+{
+    angle=-(document.getElementById("angel").value);
+    gun.rotation = angle;
+  
+}
+
+function setSpeed()
+{
+    var pointVal=document.getElementById("speed").value;
+    point.x=250;
+    var x=new Number(pointVal);
+   point.x= point.x+x; 
+  
+    SetSpeed();
+  
+}
 // ==========================================================================================================================
 
 
@@ -217,24 +241,6 @@ function whatKey(event) {
         }
     } 
 }
-
-// ==============================================================================================================
-// register body
-// ==============================================================================================================
-// ==============================================================================================================
-    function registerBody(bodyDef) {
-        
-        this.bodiesMap[0]=bodyDef;
-    }
-
-    function removeBody()
-    {
-        
-        var obj=this.bodiesMap[0];
-        world.DestroyBody(obj);
-        // stage.removeChild(wall.view);
-
-    }
 
 
 
@@ -375,12 +381,13 @@ function question()
     quize = new createjs.Bitmap(img);
     quize.x = 400;
     quize.y = 0;
+
     stage.addChild(quize); 
     quize.addEventListener("mouseover", showQuestion);
     quize.addEventListener("mouseout", removeQuestion);
     
 }
-var question,questionBox;
+var question,questionBox,dist,distw,wallh,hint;
 
 function showQuestion()
 {
@@ -390,12 +397,42 @@ function showQuestion()
     questionBox.x = 275;
     questionBox.y = 40;
 
+
+
+    var distance=Math.round((xVAl-10)/SCALE);
+    
+    dist=new createjs.Text("Distance to target : "+distance+"m","15px Arial","red");
+    dist.x=290;
+    dist.y=85;
+    stage.addChild(dist);
+
+    disw=new createjs.Text("Distance to wall : "+20+"m","15px Arial","red");
+    disw.x=290;
+    disw.y=102;
+    stage.addChild(disw); 
+
+    wallh=new createjs.Text("Height of wall : "+Math.round(200/SCALE)+"m","15px Arial","red");
+    wallh.x=290;
+    wallh.y=119;
+    stage.addChild(wallh); 
+
+
+    // hint=new createjs.Text("Hint : You can fix angle and calculate or fix speed and calculate","15px Arial","red");
+    // hint.x=290;
+    // hint.y=160;
+    // stage.addChild(hint); 
+
     stage.addChild(questionBox);
 }
 
 function removeQuestion()
 {
-    stage.removeChild(questionBox)
+    stage.removeChild(questionBox);
+    stage.removeChild(dist);
+    stage.removeChild(disw);
+    stage.removeChild(wallh);
+    
+
 }
 
 function backRetry(){
@@ -481,18 +518,18 @@ listener.PreSolve = function(contact, oldManifold) {
 // ===========================================================================================================================
 // Shoot the Ball
 //============================================================================================================================
-
+var gunBase;
 
 function ShootBall() {
-    var newX=100+(80.5*Math.cos((-angle*Math.PI)/180));
-    var newY=488-(80.5*Math.sin((-angle*Math.PI)/180));
+    var newX=100+(Math.cos((-angle*Math.PI)/180));
+    var newY=488-(Math.sin((-angle*Math.PI)/180));
     var newangle=-(angle*Math.PI)/180;
     ballCount+=1;
     // alert(speed);
     ball=new Ball(newX,newY,angle,speed);
     stage.addChild(ball.view);  
-   
-
+     stage.addChild(gun);   
+     stage.addChild(gunBase);
 }
 
 
@@ -561,7 +598,7 @@ function backgroundLoad()
     // ground.x=0;
     // ground.y=560;
 
-    var gunBase =new createjs.Bitmap("images/gunBase150x150.png");
+    gunBase =new createjs.Bitmap("images/gunBase150x150.png");
     stage.addChild(gunBase);
     gunBase.x=10;
     gunBase.y=457
@@ -573,8 +610,8 @@ function backgroundLoad()
 
 
 function tick(event) {
-    // 
-    
+
+
     manageDirection();
     stage.update(event);
     world.DrawDebugData();

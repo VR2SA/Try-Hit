@@ -3,9 +3,6 @@
 	{
 		this.view=new createjs.Bitmap("images/ball.png");
 		this.view.regX=this.view.regY=10;
-		// 
-		// var speed=14000;
-		// alert(speed);
 		var fixDef=new box2d.b2FixtureDef();
 		fixDef.density=40.0;
 		fixDef.friction=0.5;
