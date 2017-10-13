@@ -185,12 +185,12 @@ function setAngle()
   
 }
 
-function setSpeed()
+function getSpeed()
 {
     var pointVal=document.getElementById("speed").value;
     point.x=250;
     var x=new Number(pointVal);
-   point.x= point.x+x; 
+   point.x= point.x+(x*4); 
   
     SetSpeed();
   

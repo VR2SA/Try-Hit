@@ -59,13 +59,13 @@
 
 var SCALE=30;
 
-var stage,world,debug,ball,background,contact,refresh,switchs,target;
+var stage,world,debug,ball,background,contact,refresh,switchs,target,xVAl,yVAl;
 this.bodiesMap = {};
 var ballCount=0
 var hitCount=0
 
 function init() { 
-    // window.addEventListener('keydown', whatKey, true);
+   
     stage=new createjs.Stage(document.getElementById("canvas"));
     debug=document.getElementById('debug' );
     backgroundLoad();
@@ -74,21 +74,26 @@ function init() {
     sliderLine();
     refreshLoad();
     question();
+    getSpeed();
+    setAngle();
     
     xVAl=((Math.random()*1000)+200)%1100;
     yVAl=((Math.random()*400)+200)%600;
 
-    //
-    // ground_small=new GroundSmall();
-    // stage.addChild(ground_small.view);
 
-    // tree=new Tree();
-    // stage.addChild(tree.view);
-    
-    // switchs=new Switch();
-    // stage.addChild(switchs.view);
+    if(xVAl<400)
+    {
 
-     target=new Target(xVAl,yVAl);
+        xVAl=400;
+    }
+
+     if(yVAl>550)
+    {
+
+        yVAl=550;
+    }
+
+    target=new Target(xVAl,yVAl);
     stage.addChild(target.view);
 
     
@@ -219,23 +224,6 @@ function whatKey(event) {
         }
     } 
 }
-
-// ==============================================================================================================
-// register body
-// ==============================================================================================================
-// ==============================================================================================================
-    function registerBody(bodyDef) {
-        
-        this.bodiesMap[0]=bodyDef;
-    }
-
-    function removeBody()
-    {
-        
-        var obj=this.bodiesMap[0];
-        world.DestroyBody(obj);
-    }
-
 
 
 // ===========================================================================================================================
@@ -540,11 +528,30 @@ function ShootBall() {
     // alert(speed);
     ball=new Ball(newX,newY,angle,speed);
     stage.addChild(ball.view);  
-    stage.addChild(gun);   
+       
     stage.addChild(gunBase);
+    stage.addChild(gun);
 }
 
+function setAngle()
+{
+    angle=-(document.getElementById("angel").value);
+    gun.rotation = angle;
+  
+}
 
+function getSpeed()
+{
+    var pointVal=document.getElementById("speed").value;
+    point.x=250;
+    var x=new Number(pointVal);
+   point.x= point.x+(x*4);
+   if(point.x>350)
+    point.x=350; 
+  
+    SetSpeed();
+  
+}
 
 
 

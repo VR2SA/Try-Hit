@@ -19,14 +19,21 @@
         <title>Control Panel-1</title>
         <link rel="stylesheet" href="css/style.css">
 	
+
+
+
+
+    
+    
 	
 </head>
-<body onload=  "init()">
+<body onload=  "init();calAngel();">
+    <div id="total" ></div>
 	<!-- <div id="button_in" style=" float : right ;height:600px; background-color:blue;"> -->
 	<!-- <button id="shoot" onclick="ShootBall() ">shoot</button> -->
 	 
         <script src="js/index.js"></script>
- <div id="panel" class="panel-container">
+ <div id="panel" class="panel-container" >
             <header>
             Control Panel-1
             </header>
@@ -41,7 +48,8 @@
                                     </label>
                                 </td>
                                 <td>
-                                    <input type="number" id="angel" value="" style="width:90px;" onchange="setAngle()" onkeyup="setAngle()">
+                                    <input type="number" id="angel" class="angel" value="" style="width:90px;" onchange="calAngel()" onkeyup="calAngel()" ng-model="angal">
+                                    
                                 </td>
                             </tr>
                             <tr>
@@ -51,33 +59,33 @@
                                     </label>
                                 </td>
                                 <td>
-                                    <input type="number" id="speed" style="width:90px; " onchange="setSpeed()" onkeyup="setSpeed()" min ="0" max="50">
+                                    <input type="number" id="speed" style="width:90px; " onchange="getSpeed()" onkeyup="getSpeed()" min ="0" max="50">
                                 </td>
                             </tr>
                             <tr>
                                 <td>
-                                    <label for="mass">
-                                        Mass (kg)
+                                    <label for="cos">
+                                       Cosine Value
                                     </label>
                                 </td>
                                 <td>
-                                    <input type="number" id="mass" value="" style="width:90px;">
+                                    <div id="cos" value="" style="width:90px;">
                                 </td>
                             </tr>
                             <tr>
                                 <td>
-                                    <label for="diameter">
-                                        Diameter (m)
+                                    <label for="sin">
+                                       Sin Value
                                     </label>
                                 </td>
                                 <td>
-                                    <input type="number" id="diameter" value="" style="width:90px;">
+                                    <div  id="sin" value="" style="width:90px;">
                                 </td>
                             </tr>
                         </table>
                     </p>
                     <p>
-                        <button id="fire" type="button">Fire</button>
+                        <button id="fire" type="button" onclick="ShootBall()">Fire</button>
                     </p>
                 </fieldset>
             </form>
@@ -93,10 +101,13 @@
 	<canvas id="debug" width="1150" height="600" ></canvas>
 	<canvas id="canvas" width="1150" height="600" ></canvas>
 	
-	<script src="../support/Box2Dweb.js"></script>
-	<script src="../support/Box2d.min.js"></script>
-	<!-- <script src="../support/easeljs-0.5.0.min.js"></script> -->
-	<script src="../support/easeljs-0.6.0.min.js"></script>
+	
+    <script src="../support/Box2Dweb.js"></script>
+    <script src="../support/Box2d.min.js"></script>
+    <script src="../support/Box2d.min.js"></script>
+    <script src="../support/angular.min.js"></script>
+    <!-- <script src="../support/easeljs-0.5.0.min.js"></script> -->
+    <script src="../support/easeljs-0.6.0.min.js"></script>
 	<script src="Obj/target.js"></script>
 	<script src="Obj/wall.js"></script>
 	<script src="Obj/Ball.js"></script>
@@ -104,9 +115,25 @@
 
 </div>
 
+<script type="text/javascript">
+function calAngel()
+{
+    var sin = 0;
+    var cos = 0;
+    var ang = 0;
 
 
-	
+    ang = Number(document.getElementById("angel").value);
+    cos =Math.cos((-ang*Math.PI)/180);
+    sin =Math.sin((ang*Math.PI)/180);
+    cos=cos.toFixed(4);
+    sin=sin.toFixed(4);
+
+    document.getElementById('cos').innerHTML = cos;
+    document.getElementById('sin').innerHTML = sin;
+    setAngle();
+}
+</script>
 
 
 
